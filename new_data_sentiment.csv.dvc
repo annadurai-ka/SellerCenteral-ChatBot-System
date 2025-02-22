@@ -1,0 +1,13 @@
+md5: 681f4aea2bf11bc32bb585e34f65703e
+frozen: true
+deps:
+- etag: 08e9e5c7dab4d78b031001
+  size: 222932468
+  version_id: '1740231817687785'
+  hash: md5
+  path: gs://ai_chatbot_seller_central/new_data_sentiment.csv
+outs:
+- md5: 1581936ff19ec6f98a0164007f55ddec
+  size: 222932468
+  hash: md5
+  path: new_data_sentiment.csv
