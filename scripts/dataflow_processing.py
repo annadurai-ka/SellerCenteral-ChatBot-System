@@ -1,15 +1,6 @@
+from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
 import apache_beam as beam
-from apache_beam.options.pipeline_options import PipelineOptions
-from apache_beam.io.gcp.bigquery import WriteToBigQuery
-import csv
-import io
 import time
-# Define the expected field names (header order)
-FIELDNAMES = [
-    "parent_asin", "rating", "title", "text", "images", "asin", "user_id", 
-    "timestamp", "helpful_vote", "verified_purchase", "Category", "seller_id", 
-    "sentiment_label", "sentiment_score"
-]
 
 class CleanCSV(beam.DoFn):
     FIELDNAMES = [
@@ -18,9 +9,9 @@ class CleanCSV(beam.DoFn):
     "sentiment_label", "sentiment_score"
 ]
     def process(self, element):
-        # Use csv.DictReader to parse the CSV line with known headers.
         import csv
         import io
+        # Use csv.DictReader to parse the CSV line with known headers.
         reader = csv.DictReader(io.StringIO(element), fieldnames=FIELDNAMES)
         for row in reader:
             # Clean and convert fields:
@@ -58,21 +49,26 @@ class CleanCSV(beam.DoFn):
 
             # Yield the cleaned dictionary
             yield row
-import time
-# Define the pipeline options
+
+
+# Define pipeline options
 pipeline_options = PipelineOptions(
     runner="DataflowRunner",
     project="spheric-engine-451615-a8",
     temp_location="gs://ai_chatbot_seller_central/Temp",
     region="us-east1",
-    job_name="csv-cleaning-pipeline-"+ str(int(time.time()))
+    job_name="csv-cleaning-pipeline-" + str(int(time.time()))
 )
 
+# Save the main session so that global variables like FIELDNAMES are available on workers
+pipeline_options.view_as(SetupOptions).save_main_session = True
+
+# Define the pipeline
 with beam.Pipeline(options=pipeline_options) as p:
     (p
      | "Read CSV from GCS" >> beam.io.ReadFromText("gs://ai_chatbot_seller_central/new_data_sentiment.csv", skip_header_lines=1)
      | "Clean CSV Data" >> beam.ParDo(CleanCSV())
-     | "Write to BigQuery" >> WriteToBigQuery(
+     | "Write to BigQuery" >> beam.io.WriteToBigQuery(
             table="spheric-engine-451615-a8:mlops_dataset.cleaned_data",
             schema=(
                 "parent_asin:STRING, "
@@ -94,4 +90,3 @@ with beam.Pipeline(options=pipeline_options) as p:
             write_disposition=beam.io.BigQueryDisposition.WRITE_APPEND
          )
     )
-
