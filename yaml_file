@@ -1,0 +1,25 @@
+name: DVC Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  dvc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install DVC
+        run: pip install dvc[gdrive]
+
+      - name: Authenticate Google Drive
+        run: dvc remote modify gdrive_storage gdrive_use_service_account true
+
+      - name: Pull Latest Data
+        run: dvc pull
+
+      - name: Run Data Processing
+        run: python scripts/dataflow_processing.py

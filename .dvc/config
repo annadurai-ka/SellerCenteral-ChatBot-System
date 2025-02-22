@@ -1,0 +1,6 @@
+[core]
+    remote = gdrive_storage
+['remote "gdrive_storage"']
+    url = gdrive://1kFJGB0N5Q3ucAd5A4mt6O9hryjRG0pRX
+['remote "csv_file"']
+    url = gs://ai_chatbot_seller_central

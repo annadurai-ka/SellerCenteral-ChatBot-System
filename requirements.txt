@@ -1,0 +1,8 @@
+apache-airflow[gcp]
+apache-beam[gcp]
+pytest
+pandas
+google-cloud-storage
+google-cloud-bigquery
+google-cloud-logging
+dvc[gdrive]
