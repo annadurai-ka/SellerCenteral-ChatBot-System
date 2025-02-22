@@ -1,0 +1,4 @@
+steps:
+  - name: 'ubuntu'
+    script: |
+      echo "Cloud Build Trigger Test Successful!"
